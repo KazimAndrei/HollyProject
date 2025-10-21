@@ -3,21 +3,22 @@
  */
 import { Stack } from 'expo-router';
 import { useEffect } from 'react';
-import { useRouter } from 'expo-router';
+import { useRouter, usePathname } from 'expo-router';
 import { useUserStore } from '../store/useUserStore';
 import { useColorScheme } from 'react-native';
 
 export default function RootLayout() {
   const router = useRouter();
+  const pathname = usePathname();
   const colorScheme = useColorScheme();
   const { onboardingCompleted } = useUserStore();
 
   useEffect(() => {
-    // Check onboarding status and redirect
-    if (!onboardingCompleted) {
+    // Check onboarding status and redirect (but not if already on onboarding)
+    if (!onboardingCompleted && pathname !== '/onboarding') {
       router.replace('/onboarding');
     }
-  }, [onboardingCompleted]);
+  }, [onboardingCompleted, pathname]);
 
   return (
     <Stack
@@ -30,7 +31,6 @@ export default function RootLayout() {
     >
       <Stack.Screen name="index" />
       <Stack.Screen name="onboarding" />
-      <Stack.Screen name="chat/index" />
     </Stack>
   );
 }
