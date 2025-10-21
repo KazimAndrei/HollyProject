@@ -64,7 +64,22 @@ export const paywallStrings = {
 /**
  * Get price display (for future StoreKit integration)
  */
-export const getPriceDisplay = (locale: 'en' | 'ru', price?: string): string => {
-  // Phase 4B will replace with actual StoreKit localized price
-  return price || (locale === 'en' ? '$8/week' : '$8/неделю');
+export const getPriceDisplay = (locale: 'en' | 'ru', storePrice?: string): string => {
+  // Use StoreKit price if available, otherwise fallback
+  if (storePrice) {
+    return storePrice;
+  }
+  return locale === 'en' ? '$8/week' : '$8/неделю';
+};
+
+/**
+ * Get CTA text with price
+ */
+export const getCTAText = (locale: 'en' | 'ru', priceString?: string): string => {
+  const price = getPriceDisplay(locale, priceString);
+  
+  if (locale === 'ru') {
+    return `7 дней бесплатно — затем ${price}`;
+  }
+  return `Start 7-day free trial — then ${price}`;
 };
