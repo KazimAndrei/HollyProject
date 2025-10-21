@@ -36,6 +36,10 @@ interface UserState extends User {
   getCachedDailyVerse: (translationId: string) => CachedDailyVerse | null;
   invalidateDailyVerseCache: (translationId: string) => void;
   setShowPaywall: (show: boolean) => void;
+  
+  // Computed selectors
+  isSubscribed: () => boolean;
+  isGated: () => boolean;
 }
 
 // Check if cached verse is stale (> 24h)
