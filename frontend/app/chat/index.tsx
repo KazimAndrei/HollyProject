@@ -158,6 +158,13 @@ export default function ChatScreen() {
         </View>
       )}
 
+      {/* Entitlement Gate Banner */}
+      <EntitlementGate
+        isGated={isGated()}
+        locale={locale}
+        onOpenPaywall={() => router.push('/subscription?from=chat_limit')}
+      />
+
       {/* Messages */}
       <KeyboardAvoidingView
         style={styles.flex}
