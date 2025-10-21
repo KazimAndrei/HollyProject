@@ -10,6 +10,14 @@ from typing import List
 import uuid
 from datetime import datetime
 
+# Import Bible Chat services
+from services.scripture_service import ScriptureService
+from services.openai_service import OpenAIService
+from services.rag_service import RAGService
+
+# Import Bible Chat routes
+from routes import scripture, chat
+
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
