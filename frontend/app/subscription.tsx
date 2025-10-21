@@ -1,7 +1,7 @@
 /**
- * Subscription Paywall screen (UI only - Phase 4A)
+ * Subscription Paywall screen (Phase 4B - IAP integrated)
  */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
   StyleSheet,
   useColorScheme,
   Alert,
-  Linking,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -18,36 +18,135 @@ import { Ionicons } from '@expo/vector-icons';
 import { useUserStore } from '../store/useUserStore';
 import PaywallHero from '../components/PaywallHero';
 import FeatureBullet from '../components/FeatureBullet';
-import { paywallStrings } from '../strings/paywall';
+import { paywallStrings, getCTAText } from '../strings/paywall';
+import { iapService, PRODUCT_IDS } from '../services/iap';
 
 export default function SubscriptionScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ from?: string }>();
   const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-
-  const { locale } = useUserStore();
+  const isDark = colorScheme === 'dark';\n\n  const { locale, setSubscription } = useUserStore();
   const strings = paywallStrings[locale];
   const from = params.from as string | undefined;
+
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+  const [isPurchasing, setIsPurchasing] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
+  const [localizedPrice, setLocalizedPrice] = useState<string | undefined>(undefined);
+  const [banner, setBanner] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   useEffect(() => {
     // Analytics: paywall_show
     console.log('[Analytics] paywall_show', { from: from || 'manual' });
+
+    // Initialize IAP and fetch products
+    initializeIAP();
+
+    // Setup purchase listener
+    iapService.setupPurchaseListener((state) => {
+      console.log('[IAP] Purchase update received:', state);
+      setSubscription(state);
+      setIsPurchasing(false);
+
+      if (state.status === 'active') {
+        showBanner('success', locale === 'ru' ? 'Подписка активирована!' : 'Subscription activated!');
+        // Close paywall after 2s
+        setTimeout(() => router.back(), 2000);
+      }
+    });
+
+    return () => {
+      // Cleanup on unmount
+      iapService.removePurchaseListener();
+    };
   }, [from]);
 
-  const handleCTATap = () => {
-    console.log('[Analytics] paywall_cta_tap');
-    // Phase 4B will implement actual StoreKit purchase
-    Alert.alert(
-      'Coming Soon',
-      'Purchase integration will be available in Phase 4B',
-      [{ text: 'OK' }]
-    );
+  const initializeIAP = async () => {
+    if (!iapService.isAvailable()) {
+      console.warn('[IAP] Not available on this platform');
+      setIsLoadingProducts(false);
+      return;
+    }
+
+    try {
+      await iapService.connect();
+      const products = await iapService.getProducts([PRODUCT_IDS.WEEKLY_PREMIUM]);
+
+      if (products.length > 0) {
+        const product = products[0];
+        // Use iOS priceString (e.g., \"$8.99\")
+        setLocalizedPrice(product.priceString || undefined);
+        console.log('[IAP] Product loaded:', { price: product.priceString });
+      } else {
+        console.warn('[IAP] No products found');
+      }
+    } catch (error) {
+      console.error('[IAP] Init error:', error);
+    } finally {
+      setIsLoadingProducts(false);
+    }
   };
 
-  const handleRestore = () => {
+  const showBanner = (type: 'success' | 'error', message: string) => {
+    setBanner({ type, message });
+    setTimeout(() => setBanner(null), 3000);
+  };
+
+  const handleCTATap = async () => {
+    if (isPurchasing || !iapService.isAvailable()) return;
+
+    console.log('[Analytics] paywall_cta_tap');
+    setIsPurchasing(true);
+
+    try {
+      await iapService.purchaseProduct(PRODUCT_IDS.WEEKLY_PREMIUM);
+      // Result will come via listener
+    } catch (error: any) {
+      setIsPurchasing(false);
+
+      if (error?.code === 'E_USER_CANCELLED') {
+        console.log('[IAP] User cancelled purchase');
+        // Don't show error for user cancellation
+      } else {
+        const errorMsg = locale === 'ru'
+          ? 'Не удалось завершить покупку. Попробуйте снова.'
+          : 'Purchase failed. Please try again.';
+        showBanner('error', errorMsg);
+      }
+    }
+  };
+
+  const handleRestore = async () => {
+    if (isRestoring || !iapService.isAvailable()) return;
+
     console.log('[Analytics] paywall_restore_tap');
-    Alert.alert(
+    setIsRestoring(true);
+
+    try {
+      const state = await iapService.restorePurchases();
+
+      if (state.status === 'active') {
+        setSubscription(state);
+        const successMsg = locale === 'ru'
+          ? 'Покупки восстановлены!'
+          : 'Purchases restored!';
+        showBanner('success', successMsg);
+        setTimeout(() => router.back(), 2000);
+      } else {
+        const emptyMsg = locale === 'ru'
+          ? 'Покупки не найдены'
+          : 'No purchases found';
+        showBanner('error', emptyMsg);
+      }
+    } catch (error) {
+      const errorMsg = locale === 'ru'
+        ? 'Не удалось восстановить покупки'
+        : 'Failed to restore purchases';
+      showBanner('error', errorMsg);
+    } finally {
+      setIsRestoring(false);
+    }
+  };
       'Restore Purchases',
       strings.restoreNote,
       [{ text: 'OK' }]
