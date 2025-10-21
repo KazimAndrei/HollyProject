@@ -8,7 +8,9 @@ export interface User {
   translation: string; // 'kjv' | 'rst'
   onboardingCompleted: boolean;
   subscriptionStatus: 'free' | 'trial' | 'active' | 'expired';
+  needsServerValidation: boolean; // Flag for Phase 5 server validation
   trialEndsAt?: string;
+  originalTransactionId?: string;
   answersCount: number; // For teaser limit
 }
 
