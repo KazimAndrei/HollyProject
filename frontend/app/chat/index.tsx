@@ -102,6 +102,12 @@ export default function ChatScreen() {
       };
       addMessage(assistantMessage);
 
+      // Increment answers count if not subscribed (count all assistant answers including fallback)
+      if (!isSubscribed()) {
+        incrementAnswersCount();
+        console.log('[Analytics] teaser_answer_granted', { n: answersCount + 1 });
+      }
+
       // Analytics: message_answered
       console.log('[Analytics] message_answered', {
         has_citations: uniqueCitations.length > 0,
