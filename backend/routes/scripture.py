@@ -15,7 +15,7 @@ def set_scripture_service(service):
 
 
 @router.get("/scripture/{ref}")
-async def get_scripture(ref: str, locale: str = Query("en", regex="^(en|ru)$")):
+async def get_scripture(ref: str, locale: str = Query("en", pattern="^(en|ru)$")):
     """Get scripture by reference.
     
     Args:
