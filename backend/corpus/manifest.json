@@ -1,0 +1,19 @@
+{
+  "translations": [
+    {
+      "id": "kjv",
+      "lang": "en",
+      "name": "King James Version",
+      "path": "corpus/en/kjv.min.json",
+      "license": "public-domain"
+    },
+    {
+      "id": "rst",
+      "lang": "ru",
+      "name": "Russian Synodal Translation",
+      "path": "corpus/ru/rst.min.json",
+      "license": "public-domain"
+    }
+  ],
+  "commentaries": []
+}
