@@ -48,6 +48,7 @@ export const useUserStore = create<UserState>()(persist(
     subscriptionStatus: 'free',
     answersCount: 0,
     cachedDailyVerses: {},
+    showPaywall: false,
 
     // Actions
     setLocale: (locale) => {
