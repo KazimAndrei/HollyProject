@@ -93,6 +93,20 @@ export const useUserStore = create<UserState>()(persist(
 
     setSubscriptionStatus: (status) => set({ subscriptionStatus: status }),
 
+    setSubscription: (data) => set({
+      subscriptionStatus: data.status,
+      needsServerValidation: data.needsServerValidation ?? false,
+      trialEndsAt: data.trialEndsAt,
+      originalTransactionId: data.originalTransactionId,
+    }),
+
+    resetSubscription: () => set({
+      subscriptionStatus: 'free',
+      needsServerValidation: false,
+      trialEndsAt: undefined,
+      originalTransactionId: undefined,
+    }),
+
     incrementAnswersCount: () => set((state) => ({ answersCount: state.answersCount + 1 })),
 
     resetAnswersCount: () => set({ answersCount: 0 }),
