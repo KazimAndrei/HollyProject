@@ -14,6 +14,9 @@ interface CachedDailyVerse {
 interface UserState extends User {
   // Cached daily verses by translation
   cachedDailyVerses: Record<string, CachedDailyVerse>; // key: `dailyVerse:<translationId>`
+  
+  // Paywall state
+  showPaywall: boolean;
 
   // Actions
   setLocale: (locale: 'en' | 'ru') => void;
@@ -25,6 +28,7 @@ interface UserState extends User {
   setCachedDailyVerse: (translationId: string, verse: Verse) => void;
   getCachedDailyVerse: (translationId: string) => CachedDailyVerse | null;
   invalidateDailyVerseCache: (translationId: string) => void;
+  setShowPaywall: (show: boolean) => void;
 }
 
 // Check if cached verse is stale (> 24h)
