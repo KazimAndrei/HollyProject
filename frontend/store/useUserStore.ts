@@ -44,7 +44,7 @@ export const useUserStore = create<UserState>()(persist(
     resetAnswersCount: () => set({ answersCount: 0 }),
   }),
   {
-    name: 'bible-chat-user-storage',
+    name: 'bc_user_v1',
     storage: createJSONStorage(() => AsyncStorage),
   }
 ));
