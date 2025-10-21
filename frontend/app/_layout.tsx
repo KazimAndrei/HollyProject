@@ -32,6 +32,14 @@ export default function RootLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="onboarding" />
       <Stack.Screen name="chat/index" />
+      <Stack.Screen name="passage/[ref]" />
+      <Stack.Screen
+        name="subscription"
+        options={{
+          presentation: 'modal',
+          animation: 'slide_from_bottom',
+        }}
+      />
     </Stack>
   );
 }
