@@ -16,20 +16,24 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useUserStore } from '../../store/useUserStore';
 import { useChatStore } from '../../store/useChatStore';
 import { sendChatMessage } from '../../services/api';
 import { parseCitations } from '../../utils/deeplink';
 import MessageBubble from '../../components/MessageBubble';
+import EntitlementGate from '../../components/EntitlementGate';
+import { getFreeAnswersText } from '../../strings/paywall';
 import { Message } from '../../types';
 
 export default function ChatScreen() {
+  const router = useRouter();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const insets = useSafeAreaInsets();
 
-  const { locale } = useUserStore();
+  const { locale, answersCount, incrementAnswersCount, isSubscribed, isGated } = useUserStore();
   const { messages, isLoading, addMessage, setLoading } = useChatStore();
 
   const [inputText, setInputText] = useState('');
@@ -43,6 +47,13 @@ export default function ChatScreen() {
 
   const handleSend = async () => {
     if (!inputText.trim() || isLoading) return;
+
+    // Check if gated - open paywall immediately
+    if (isGated()) {
+      console.log('[Analytics] teaser_limit_hit');
+      router.push('/subscription?from=chat_limit');
+      return;
+    }
 
     const userMessageText = inputText.trim();
     setInputText('');
