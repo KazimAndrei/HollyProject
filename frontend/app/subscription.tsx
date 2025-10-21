@@ -157,14 +157,13 @@ export default function SubscriptionScreen() {
     console.log('[Analytics] paywall_manage_tap');
     Alert.alert(
       strings.manage,
-      'Opens iOS Settings → Subscriptions',
+      'Opens iOS Settings → Subscriptions (placeholder)',
       [{ text: 'OK' }]
     );
   };
 
   const handleTerms = () => {
     console.log('[Analytics] paywall_terms_tap');
-    // Mock: would open external link
     Alert.alert(
       strings.terms,
       'https://biblechat.app/terms (placeholder)',
@@ -177,7 +176,6 @@ export default function SubscriptionScreen() {
 
   const handlePrivacy = () => {
     console.log('[Analytics] paywall_privacy_tap');
-    // Mock: would open external link
     Alert.alert(
       strings.privacy,
       'https://biblechat.app/privacy (placeholder)',
@@ -187,6 +185,8 @@ export default function SubscriptionScreen() {
       ]
     );
   };
+
+  const ctaText = getCTAText(locale, localizedPrice);
 
   return (
     <SafeAreaView
