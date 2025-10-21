@@ -122,6 +122,8 @@ export const useUserStore = create<UserState>()(persist(
         return { cachedDailyVerses: newCache };
       });
     },
+
+    setShowPaywall: (show) => set({ showPaywall: show }),
   }),
   {
     name: 'bc_user_v1',
