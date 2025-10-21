@@ -126,7 +126,9 @@ export default function OnboardingScreen() {
             )}
           </View>
           <Text style={[styles.disclaimerText, isDark ? styles.subtextDark : styles.subtextLight]}>
-            I understand this is an informational assistant, not a theological or legal authority.
+            {selectedLocale === 'ru'
+              ? 'Приложение предоставляет информационную поддержку на основе Библии. Это не замена пасторскому наставлению и профессиональным рекомендациям.'
+              : 'This app provides informational support based on the Bible. It is not a replacement for pastoral counsel or professional advice.'}
           </Text>
         </TouchableOpacity>
       </View>
