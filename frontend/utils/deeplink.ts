@@ -43,19 +43,28 @@ const normalizeBookName = (book: string, locale: 'en' | 'ru'): string => {
 };
 
 /**
- * Build deep link for passage viewer
- * Format: app://passage/{ref}
+ * Normalize reference (resolve aliases)
+ * @param ref - Reference string (e.g., "Jn 3:16" or "Ин 3:16")
+ * @param locale - Language locale
+ * @returns Normalized reference
  */
-export const buildPassageDeeplink = (ref: string, locale: 'en' | 'ru'): string => {
-  // Parse ref (e.g., "John 3:16" or "Иоанна 3:16")
+export const normalizeRef = (ref: string, locale: 'en' | 'ru'): string => {
   const parts = ref.split(' ');
   if (parts.length >= 2) {
     const book = normalizeBookName(parts[0], locale);
     const rest = parts.slice(1).join(' ');
-    const normalizedRef = `${book} ${rest}`;
-    return `app://passage/${encodeURIComponent(normalizedRef)}`;
+    return `${book} ${rest}`;
   }
-  return `app://passage/${encodeURIComponent(ref)}`;
+  return ref;
+};
+
+/**
+ * Build deep link for passage viewer
+ * Format: app://passage/{ref}
+ */
+export const buildPassageDeeplink = (ref: string, locale: 'en' | 'ru'): string => {
+  const normalizedRef = normalizeRef(ref, locale);
+  return `app://passage/${encodeURIComponent(normalizedRef)}`;
 };
 
 /**
@@ -88,4 +97,35 @@ export const parseCitations = (text: string, locale: 'en' | 'ru'): string[] => {
 export const truncateCitation = (ref: string, maxLength: number = 25): string => {
   if (ref.length <= maxLength) return ref;
   return ref.substring(0, maxLength - 1) + '…';
+};
+
+/**
+ * Find first match of query in text (case-insensitive, whole-word)
+ * Returns character offset range or null
+ */
+export const findFirstMatch = (text: string, query: string): { start: number; end: number } | null => {
+  const normalizedText = text.toLowerCase();
+  const normalizedQuery = query.toLowerCase();
+  
+  // Try whole-word match first
+  const wordRegex = new RegExp(`\\b${normalizedQuery}\\b`, 'i');
+  const match = text.match(wordRegex);
+  
+  if (match && match.index !== undefined) {
+    return {
+      start: match.index,
+      end: match.index + match[0].length,
+    };
+  }
+  
+  // Fallback: simple substring match
+  const index = normalizedText.indexOf(normalizedQuery);
+  if (index !== -1) {
+    return {
+      start: index,
+      end: index + query.length,
+    };
+  }
+  
+  return null;
 };
