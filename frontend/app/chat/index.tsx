@@ -363,4 +363,29 @@ const styles = StyleSheet.create({
     backgroundColor: '#9CA3AF',
     opacity: 0.5,
   },
+  progressChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 8,
+    alignSelf: 'flex-start',
+  },
+  progressChipLight: {
+    backgroundColor: '#E0E7FF',
+  },
+  progressChipDark: {
+    backgroundColor: '#1F2937',
+    borderWidth: 1,
+    borderColor: '#4C7CF0',
+  },
+  progressChipText: {
+    fontSize: 13,
+    fontWeight: '500',
+    marginLeft: 6,
+    color: '#4C7CF0',
+  },
 });
