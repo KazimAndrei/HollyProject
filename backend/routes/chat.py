@@ -18,7 +18,7 @@ def set_rag_service(service):
 class ChatRequest(BaseModel):
     """Chat request model."""
     text: str = Field(..., min_length=1, max_length=500, description="User question")
-    locale: str = Field("en", regex="^(en|ru)$", description="Language locale")
+    locale: str = Field("en", pattern="^(en|ru)$", description="Language locale")
 
 
 class ChatResponse(BaseModel):
