@@ -4,7 +4,8 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, useColorScheme, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { truncateCitation, buildPassageDeeplink } from '../utils/deeplink';
+import { useRouter } from 'expo-router';
+import { truncateCitation } from '../utils/deeplink';
 import { useChatStore } from '../store/useChatStore';
 import { useUserStore } from '../store/useUserStore';
 
@@ -14,20 +15,20 @@ interface CitationChipProps {
 }
 
 export default function CitationChip({ ref, onPress }: CitationChipProps) {
+  const router = useRouter();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const { locale } = useUserStore();
   const { setLastTappedCitationRef } = useChatStore();
 
   const handlePress = () => {
-    const deeplink = buildPassageDeeplink(ref, locale);
-    console.log('[Analytics] citation_tap', { ref, deeplink });
+    console.log('[Analytics] citation_tap', { ref });
     
-    // Store last tapped ref for Phase 2C
+    // Store last tapped ref
     setLastTappedCitationRef(ref);
     
-    // Placeholder: will navigate to Passage Viewer in Phase 2C
-    console.log('[Navigation] Navigate to:', deeplink);
+    // Navigate to Passage Viewer
+    router.push(`/passage/${encodeURIComponent(ref)}?from=chat_citation`);
     
     if (onPress) {
       onPress(ref);
@@ -36,8 +37,6 @@ export default function CitationChip({ ref, onPress }: CitationChipProps) {
 
   const handleLongPress = () => {
     // Copy full ref on long press
-    // Note: React Native doesn't have Clipboard in core, would need expo-clipboard
-    // For now, just show alert with full ref
     Alert.alert('Citation', ref, [
       { text: 'OK', style: 'default' },
     ]);
