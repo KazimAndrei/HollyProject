@@ -193,6 +193,16 @@ export default function ChatScreen() {
           }
         />
 
+        {/* Free Answers Progress Chip (only if not subscribed) */}
+        {!isSubscribed() && answersCount > 0 && answersCount < 2 && (
+          <View style={[styles.progressChip, isDark ? styles.progressChipDark : styles.progressChipLight]}>
+            <Ionicons name="gift-outline" size={14} color="#4C7CF0" />
+            <Text style={[styles.progressChipText, isDark ? styles.textDark : styles.textLight]}>
+              {getFreeAnswersText(locale, answersCount)}
+            </Text>
+          </View>
+        )}
+
         {/* Input */}
         <View
           style={[
