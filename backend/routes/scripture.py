@@ -40,7 +40,7 @@ async def get_scripture(ref: str, locale: str = Query("en", pattern="^(en|ru)$")
 
 
 @router.get("/daily-verse")
-async def get_daily_verse(locale: str = Query("en", regex="^(en|ru)$")):
+async def get_daily_verse(locale: str = Query("en", pattern="^(en|ru)$")):
     """Get daily verse.
     
     Args:
