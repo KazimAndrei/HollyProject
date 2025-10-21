@@ -152,6 +152,17 @@ export const useUserStore = create<UserState>()(persist(
     },
 
     setShowPaywall: (show) => set({ showPaywall: show }),
+
+    // Computed selectors
+    isSubscribed: () => {
+      const state = get();
+      return state.subscriptionStatus === 'active' && !state.needsServerValidation;
+    },
+
+    isGated: () => {
+      const state = get();
+      return !get().isSubscribed() && state.answersCount >= 2;
+    },
   }),
   {
     name: 'bc_user_v1',
