@@ -63,6 +63,33 @@ async def get_status_checks():
 # Include the router in the main app
 app.include_router(api_router)
 
+# Include Bible Chat routers
+app.include_router(scripture.router)
+app.include_router(chat.router)
+
+# Initialize Bible Chat services on startup
+@app.on_event("startup")
+async def startup_event():
+    """Initialize Bible Chat services."""
+    try:
+        # Initialize Scripture Service
+        scripture_svc = ScriptureService(corpus_dir=str(ROOT_DIR / "corpus"))
+        scripture.set_scripture_service(scripture_svc)
+        
+        # Initialize OpenAI Service with Emergent LLM key
+        openai_svc = OpenAIService(api_key=os.getenv("EMERGENT_LLM_KEY"))
+        
+        # Initialize RAG Service
+        rag_svc = RAGService(
+            scripture_service=scripture_svc,
+            openai_service=openai_svc
+        )
+        chat.set_rag_service(rag_svc)
+        
+        logger.info("✅ Bible Chat services initialized successfully")
+    except Exception as e:
+        logger.error(f"❌ Failed to initialize Bible Chat services: {e}")
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
