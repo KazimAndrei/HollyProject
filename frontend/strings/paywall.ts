@@ -30,6 +30,12 @@ export const paywallStrings = {
     manage: 'Manage Subscription',
     terms: 'Terms of Service',
     privacy: 'Privacy Policy',
+
+    // Gating
+    freeAnswersProgress: 'Free answers: {count}/2',
+    freeLimitReached: 'Free limit reached',
+    unlockPrompt: 'Enjoyed this? Start your 7-day free trial to continue.',
+    unlockButton: 'Unlock with free trial',
   },
   ru: {
     // Hero
@@ -58,6 +64,12 @@ export const paywallStrings = {
     manage: 'Управление подпиской',
     terms: 'Условия использования',
     privacy: 'Политика конфиденциальности',
+
+    // Gating
+    freeAnswersProgress: 'Бесплатные ответы: {count}/2',
+    freeLimitReached: 'Лимит исчерпан',
+    unlockPrompt: 'Понравилось? Начните 7-дневный бесплатный период, чтобы продолжить.',
+    unlockButton: 'Разблокировать пробный период',
   },
 };
 
@@ -82,4 +94,12 @@ export const getCTAText = (locale: 'en' | 'ru', priceString?: string): string =>
     return `7 дней бесплатно — затем ${price}`;
   }
   return `Start 7-day free trial — then ${price}`;
+};
+
+/**
+ * Get free answers progress text
+ */
+export const getFreeAnswersText = (locale: 'en' | 'ru', count: number): string => {
+  const template = paywallStrings[locale].freeAnswersProgress;
+  return template.replace('{count}', count.toString());
 };
