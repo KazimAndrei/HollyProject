@@ -23,6 +23,13 @@ interface UserState extends User {
   setTranslation: (translation: string) => void;
   completeOnboarding: () => void;
   setSubscriptionStatus: (status: User['subscriptionStatus']) => void;
+  setSubscription: (data: {
+    status: User['subscriptionStatus'];
+    needsServerValidation?: boolean;
+    trialEndsAt?: string;
+    originalTransactionId?: string;
+  }) => void;
+  resetSubscription: () => void;
   incrementAnswersCount: () => void;
   resetAnswersCount: () => void;
   setCachedDailyVerse: (translationId: string, verse: Verse) => void;
