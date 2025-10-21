@@ -25,9 +25,7 @@ export default function SubscriptionScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ from?: string }>();
   const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-
-  const { locale, setSubscription } = useUserStore();
+  const isDark = colorScheme === 'dark';\n\n  const { locale, setSubscription } = useUserStore();
   const strings = paywallStrings[locale];
   const from = params.from as string | undefined;
 
@@ -76,7 +74,7 @@ export default function SubscriptionScreen() {
 
       if (products.length > 0) {
         const product = products[0];
-        // Use iOS priceString (e.g., "$8.99")
+        // Use iOS priceString (e.g., \"$8.99\")
         setLocalizedPrice(product.priceString || undefined);
         console.log('[IAP] Product loaded:', { price: product.priceString });
       } else {
@@ -149,6 +147,11 @@ export default function SubscriptionScreen() {
       setIsRestoring(false);
     }
   };
+      'Restore Purchases',
+      strings.restoreNote,
+      [{ text: 'OK' }]
+    );
+  };
 
   const handleManage = () => {
     console.log('[Analytics] paywall_manage_tap');
@@ -203,20 +206,6 @@ export default function SubscriptionScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Banner (success/error) */}
-      {banner && (
-        <View style={[styles.banner, banner.type === 'success' ? styles.bannerSuccess : styles.bannerError]}>
-          <Ionicons
-            name={banner.type === 'success' ? 'checkmark-circle' : 'alert-circle'}
-            size={20}
-            color={banner.type === 'success' ? '#10B981' : '#EF4444'}
-          />
-          <Text style={[styles.bannerText, banner.type === 'success' ? styles.bannerTextSuccess : styles.bannerTextError]}>
-            {banner.message}
-          </Text>
-        </View>
-      )}
-
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -238,31 +227,21 @@ export default function SubscriptionScreen() {
 
         {/* CTA Button */}
         <TouchableOpacity
-          style={[
-            styles.ctaButton,
-            (isPurchasing || isLoadingProducts) && styles.ctaButtonDisabled,
-          ]}
+          style={[styles.ctaButton, styles.ctaButtonDisabled]}
           onPress={handleCTATap}
-          disabled={isPurchasing || isLoadingProducts}
           activeOpacity={0.8}
           testID="paywall-cta-button"
           accessible={true}
-          accessibilityLabel={ctaText}
+          accessibilityLabel={strings.cta}
           accessibilityRole="button"
         >
-          {isPurchasing ? (
-            <ActivityIndicator size="small" color="#FFFFFF" />
-          ) : (
-            <Text style={styles.ctaButtonText}>{ctaText}</Text>
-          )}
+          <Text style={styles.ctaButtonText}>{strings.cta}</Text>
         </TouchableOpacity>
 
-        {/* Loading note */}
-        {isLoadingProducts && (
-          <Text style={[styles.loadingNote, isDark ? styles.subtextDark : styles.subtextLight]}>
-            {locale === 'ru' ? 'Загрузка цен...' : 'Loading prices...'}
-          </Text>
-        )}
+        {/* Disabled note */}
+        <Text style={[styles.disabledNote, isDark ? styles.subtextDark : styles.subtextLight]}>
+          {strings.ctaDisabled}
+        </Text>
 
         {/* Fine print */}
         <Text style={[styles.finePrint, isDark ? styles.subtextDark : styles.subtextLight]}>
@@ -275,19 +254,15 @@ export default function SubscriptionScreen() {
           <TouchableOpacity
             style={styles.footerButton}
             onPress={handleRestore}
-            disabled={isRestoring}
+            disabled={true}
             testID="paywall-restore-button"
             accessible={true}
             accessibilityLabel={strings.restore}
             accessibilityRole="button"
           >
-            {isRestoring ? (
-              <ActivityIndicator size="small" color="#4C7CF0" />
-            ) : (
-              <Text style={styles.footerButtonText}>
-                {strings.restore}
-              </Text>
-            )}
+            <Text style={[styles.footerButtonText, styles.footerButtonTextDisabled]}>
+              {strings.restore}
+            </Text>
           </TouchableOpacity>
 
           {/* Manage */}
@@ -348,33 +323,6 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 4,
   },
-  banner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginHorizontal: 16,
-    marginBottom: 16,
-    borderRadius: 8,
-  },
-  bannerSuccess: {
-    backgroundColor: '#D1FAE5',
-  },
-  bannerError: {
-    backgroundColor: '#FEE2E2',
-  },
-  bannerText: {
-    fontSize: 14,
-    marginLeft: 8,
-    flex: 1,
-    fontWeight: '500',
-  },
-  bannerTextSuccess: {
-    color: '#065F46',
-  },
-  bannerTextError: {
-    color: '#991B1B',
-  },
   scrollContent: {
     paddingHorizontal: 24,
     paddingBottom: 40,
@@ -391,17 +339,17 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   ctaButtonDisabled: {
-    opacity: 0.6,
+    opacity: 0.7,
   },
   ctaButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
   },
-  loadingNote: {
+  disabledNote: {
     fontSize: 12,
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
     fontStyle: 'italic',
   },
   finePrint: {
@@ -418,14 +366,14 @@ const styles = StyleSheet.create({
   footerButton: {
     paddingVertical: 8,
     paddingHorizontal: 12,
-    minHeight: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   footerButtonText: {
     fontSize: 14,
     color: '#4C7CF0',
     fontWeight: '500',
+  },
+  footerButtonTextDisabled: {
+    color: '#9CA3AF',
   },
   legalLinks: {
     flexDirection: 'row',
