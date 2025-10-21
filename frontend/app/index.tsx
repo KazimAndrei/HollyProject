@@ -87,8 +87,8 @@ export default function HomeScreen() {
   };
 
   const handleReadContext = (ref: string) => {
-    // Placeholder for Phase 2D - will navigate to Passage Viewer
-    console.log('[Navigation] Navigate to Passage Viewer:', ref);
+    // Navigate to Passage Viewer
+    router.push(`/passage/${encodeURIComponent(ref)}?from=daily_verse`);
   };
 
   const handleAskQuestion = (ref: string) => {
