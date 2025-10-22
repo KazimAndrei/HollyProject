@@ -40,6 +40,7 @@ interface UserState extends User {
   // Computed selectors
   isSubscribed: () => boolean;
   isGated: () => boolean;
+  getOriginalTransactionId: () => string | undefined;
 }
 
 // Check if cached verse is stale (> 24h)
