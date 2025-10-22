@@ -74,6 +74,7 @@ logger = logging.getLogger(__name__)
 # Include Bible Chat routers
 app.include_router(scripture.router)
 app.include_router(chat.router)
+app.include_router(subscription.router)
 
 # Initialize Bible Chat services on startup
 @app.on_event("startup")
@@ -93,6 +94,10 @@ async def startup_event():
             openai_service=openai_svc
         )
         chat.set_rag_service(rag_svc)
+        
+        # Initialize AppStore Service
+        appstore_svc = AppStoreService()
+        subscription.set_appstore_service(appstore_svc)
         
         logger.info("✅ Bible Chat services initialized successfully")
     except Exception as e:
