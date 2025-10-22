@@ -101,3 +101,176 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Bible Chat iOS app MVP - AI-powered pastoral assistant with RAG, scripture viewer, citations, and subscription paywall"
+
+backend:
+  - task: "Scripture corpus loading (KJV EN + Russian Synodal RU)"
+    implemented: true
+    working: true
+    file: "services/scripture_service.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Mini-corpus loaded (15 passages per language), manifest.json validated, search working"
+  
+  - task: "RAG service with OpenAI GPT-4o"
+    implemented: true
+    working: "partial"
+    file: "services/rag_service.py, services/openai_service.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "partial"
+        agent: "main"
+        comment: "RAG pipeline implemented, OpenAI API has network issue (connection error), fallback responses work"
+  
+  - task: "Chat endpoint POST /api/chat"
+    implemented: true
+    working: true
+    file: "routes/chat.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Endpoint working, returns fallback when OpenAI unavailable, citations parsed correctly"
+  
+  - task: "Scripture endpoints GET /api/scripture/{ref}, GET /api/daily-verse"
+    implemented: true
+    working: true
+    file: "routes/scripture.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Both endpoints tested with curl, returning correct data for EN/RU"
+  
+  - task: "Citation parser (EN/RU regex)"
+    implemented: true
+    working: true
+    file: "services/citation_parser.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Unit tests 7/7 passed, supports both EN and RU citation formats"
+
+frontend:
+  - task: "Onboarding screen (translation select + disclaimer)"
+    implemented: true
+    working: "NA"
+    file: "app/onboarding.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented with Zustand persistence, web preview has import.meta issue (expected on native)"
+  
+  - task: "Home screen with Daily Verse card"
+    implemented: true
+    working: "NA"
+    file: "app/index.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "DailyVerseCard with cache, offline fallback, navigation hooks implemented"
+  
+  - task: "Chat screen with citations"
+    implemented: true
+    working: "NA"
+    file: "app/chat/index.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "MessageBubble + CitationChip, API integration, teaser limit (2 free answers) implemented"
+  
+  - task: "Passage Viewer with highlights"
+    implemented: true
+    working: "NA"
+    file: "app/passage/[ref].tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Dynamic route, highlight spans (max 3), translation switcher, navigation from citations"
+  
+  - task: "Subscription Paywall UI + IAP"
+    implemented: true
+    working: "NA"
+    file: "app/subscription.tsx, services/iap.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "expo-in-app-purchases integrated, localized prices, purchase/restore flows, requires device testing"
+  
+  - task: "Teaser limit + content gating"
+    implemented: true
+    working: "NA"
+    file: "app/chat/index.tsx, components/EntitlementGate.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "2 free answers implemented, gate banner, progress chip, isGated() selector"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Chat EN gating (2 free answers → paywall)"
+    - "Chat RU gating"
+    - "Citations → Passage Viewer navigation"
+    - "Daily Verse offline cache"
+    - "Scripture API endpoints (EN/RU)"
+    - "Citation parser regex (EN/RU)"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: |
+      Bible Chat MVP completed (Phases 1-4C). 
+      Backend: Scripture corpus (15 passages EN/RU), RAG with OpenAI GPT-4o (network issue - fallback works), Chat + Scripture endpoints tested with curl.
+      Frontend: Onboarding, Home (Daily Verse), Chat (citations + teaser limit), Passage Viewer, Subscription Paywall (IAP wired).
+      
+      Testing priorities:
+      1. Backend API smoke tests (scripture, daily-verse, chat endpoints)
+      2. Citation parsing (EN/RU regex)
+      3. Note: Frontend testing limited due to web preview issues (import.meta) - native device needed for full IAP testing
+      
+      Known limitations:
+      - OpenAI API network issue (fallback responses work)
+      - Web preview not working (native focus)
+      - IAP requires physical device + Sandbox account
+      
+      Please test backend endpoints first, then provide report.
