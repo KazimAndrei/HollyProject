@@ -174,11 +174,13 @@ class IAPService {
           console.log('[Analytics] iap_restore_success', { productId: ourProduct.productId });
           console.log('✅ [IAP] Restore found purchase:', ourProduct);
 
-          return {
-            status: 'active', // Phase 5 will validate on server
-            needsServerValidation: true,
-            originalTransactionId: ourProduct.transactionId,
-          };
+          // Verify with server
+          const verifiedState = await this.verifyWithServer(
+            ourProduct.transactionId,
+            cachedOriginalTransactionId
+          );
+
+          return verifiedState;
         } else {
           console.log('[Analytics] iap_restore_empty', { reason: 'no_matching_product' });
           return { status: 'free', needsServerValidation: false };
