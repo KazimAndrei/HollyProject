@@ -110,9 +110,52 @@ class IAPService {
   }
 
   /**
+   * Verify subscription with backend server
+   * @param transactionId - Transaction ID from purchase/restore
+   * @param cachedOriginalTransactionId - Cached original transaction ID if available
+   */
+  async verifyWithServer(
+    transactionId: string,
+    cachedOriginalTransactionId?: string
+  ): Promise<SubscriptionState> {
+    try {
+      console.log('[Analytics] verify_subscription_start', { transactionId });
+
+      const response = await axios.post(`${BACKEND_URL}/api/subscription/verify`, {
+        platform: 'ios',
+        transactionId,
+        originalTransactionId: cachedOriginalTransactionId,
+      });
+
+      const data = response.data;
+      console.log('[Analytics] verify_subscription_success', {
+        status: data.status,
+        originalTransactionId: data.originalTransactionId,
+      });
+
+      return {
+        status: data.status === 'active' ? 'active' : data.status === 'trial' ? 'trial' : 'expired',
+        needsServerValidation: false,
+        trialEndsAt: data.trialEndsAt,
+        originalTransactionId: data.originalTransactionId,
+      };
+    } catch (error) {
+      console.error('❌ [IAP] Server verification failed:', error);
+      console.log('[Analytics] verify_subscription_fail', { error });
+
+      // Return temporary state pending server validation
+      return {
+        status: 'active',
+        needsServerValidation: true,
+        originalTransactionId: cachedOriginalTransactionId,
+      };
+    }
+  }
+
+  /**
    * Restore purchases
    */
-  async restorePurchases(): Promise<SubscriptionState> {
+  async restorePurchases(cachedOriginalTransactionId?: string): Promise<SubscriptionState> {
     if (!this.isInitialized) {
       await this.connect();
     }
