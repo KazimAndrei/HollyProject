@@ -163,6 +163,10 @@ export const useUserStore = create<UserState>()(persist(
       const state = get();
       return !get().isSubscribed() && state.answersCount >= 2;
     },
+
+    getOriginalTransactionId: () => {
+      return get().originalTransactionId;
+    },
   }),
   {
     name: 'bc_user_v1',
