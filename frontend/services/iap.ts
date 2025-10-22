@@ -4,6 +4,11 @@
  */
 import * as InAppPurchases from 'expo-in-app-purchases';
 import { Platform } from 'react-native';
+import axios from 'axios';
+import Constants from 'expo-constants';
+
+// Get backend URL
+const BACKEND_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:8001';
 
 // Product IDs
 export const PRODUCT_IDS = {
