@@ -125,9 +125,12 @@ export default function SubscriptionScreen() {
     setIsRestoring(true);
 
     try {
-      const state = await iapService.restorePurchases();
+      const { getOriginalTransactionId } = useUserStore.getState();
+      const cachedId = getOriginalTransactionId();
+      
+      const state = await iapService.restorePurchases(cachedId);
 
-      if (state.status === 'active') {
+      if (state.status === 'active' || state.status === 'trial') {
         setSubscription(state);
         const successMsg = locale === 'ru'
           ? 'Покупки восстановлены!'
