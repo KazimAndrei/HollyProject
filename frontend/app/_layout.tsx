@@ -2,16 +2,18 @@
  * Root layout with navigation and onboarding check
  */
 import { Stack } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'expo-router';
 import { useUserStore } from '../store/useUserStore';
+import { iapService } from '../services/iap';
 import { useColorScheme } from 'react-native';
 
 export default function RootLayout() {
   const router = useRouter();
   const pathname = usePathname();
   const colorScheme = useColorScheme();
-  const { onboardingCompleted } = useUserStore();
+  const { onboardingCompleted, getOriginalTransactionId, needsServerValidation, setSubscription } = useUserStore();
+  const hasSyncedEntitlement = useRef(false);
 
   useEffect(() => {
     // Check onboarding status and redirect (but not if already on onboarding)
@@ -19,6 +21,32 @@ export default function RootLayout() {
       router.replace('/onboarding');
     }
   }, [onboardingCompleted, pathname]);
+
+  useEffect(() => {
+    // Sync entitlement on launch (once per session)
+    if (hasSyncedEntitlement.current) return;
+
+    const syncEntitlement = async () => {
+      const originalTransactionId = getOriginalTransactionId();
+      
+      // Sync if we have a transaction ID or need validation
+      if (originalTransactionId || needsServerValidation) {
+        hasSyncedEntitlement.current = true;
+
+        const state = await iapService.syncEntitlementOnLaunch(
+          originalTransactionId,
+          needsServerValidation
+        );
+
+        if (state) {
+          setSubscription(state);
+          console.log('✅ [App] Entitlement synced on launch:', state.status);
+        }
+      }
+    };
+
+    syncEntitlement();
+  }, []);
 
   return (
     <Stack
