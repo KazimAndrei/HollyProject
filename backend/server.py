@@ -14,9 +14,10 @@ from datetime import datetime
 from services.scripture_service import ScriptureService
 from services.openai_service import OpenAIService
 from services.rag_service import RAGService
+from services.appstore_service import AppStoreService
 
 # Import Bible Chat routes
-from routes import scripture, chat
+from routes import scripture, chat, subscription
 
 
 ROOT_DIR = Path(__file__).parent
