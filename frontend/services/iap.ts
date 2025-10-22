@@ -257,6 +257,53 @@ class IAPService {
   }
 
   /**
+   * Sync entitlement status on app launch (throttled - once per session)
+   * @param cachedOriginalTransactionId - Cached original transaction ID from store
+   * @param needsServerValidation - Whether server validation is needed
+   */
+  async syncEntitlementOnLaunch(
+    cachedOriginalTransactionId?: string,
+    needsServerValidation: boolean = false
+  ): Promise<SubscriptionState | null> {
+    // Skip if no transaction ID and no validation needed
+    if (!cachedOriginalTransactionId && !needsServerValidation) {
+      console.log('[IAP] Sync skipped - no transaction ID');
+      return null;
+    }
+
+    try {
+      console.log('[Analytics] entitlement_sync_start', {
+        hasOriginalTransactionId: !!cachedOriginalTransactionId,
+      });
+
+      const response = await axios.get(`${BACKEND_URL}/api/subscription/status`, {
+        params: {
+          originalTransactionId: cachedOriginalTransactionId,
+        },
+      });
+
+      const data = response.data;
+      console.log('[Analytics] entitlement_sync_success', {
+        status: data.status,
+        originalTransactionId: data.originalTransactionId,
+      });
+
+      return {
+        status: data.status === 'active' ? 'active' : data.status === 'trial' ? 'trial' : 'expired',
+        needsServerValidation: false,
+        trialEndsAt: data.trialEndsAt,
+        originalTransactionId: data.originalTransactionId,
+      };
+    } catch (error) {
+      console.error('❌ [IAP] Entitlement sync failed:', error);
+      console.log('[Analytics] entitlement_sync_fail', { reason: 'network_or_server_error' });
+
+      // Return null - keep previous local state (don't flip to free)
+      return null;
+    }
+  }
+
+  /**
    * Check if IAP is available on platform
    */
   isAvailable(): boolean {
