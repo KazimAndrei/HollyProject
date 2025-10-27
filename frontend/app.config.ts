@@ -45,7 +45,7 @@ const config = ({ config }: ConfigContext): ExpoConfig => ({
         image: './assets/images/splash-image.png',
         imageWidth: 200,
         resizeMode: 'contain',
-        backgroundColor: '#000',
+        backgroundColor: '#000000',
       },
     ],
   ],
