@@ -28,7 +28,7 @@ const config = ({ config }: ConfigContext): ExpoConfig => ({
     versionCode: 1,
     adaptiveIcon: {
       foregroundImage: './assets/images/adaptive-icon.png',
-      backgroundColor: '#000',
+      backgroundColor: '#000000',
     },
     edgeToEdgeEnabled: true,
   },
