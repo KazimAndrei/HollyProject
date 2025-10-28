@@ -6,9 +6,9 @@ const config = ({ config }: ConfigContext): ExpoConfig => ({
   slug: 'bible-chat',
   version: '1.0.0',
   orientation: 'portrait',
-  icon: './assets/images/icon.png',
+  icon: './assets/icon.png',
   splash: {
-    image: './assets/images/splash-image.png',
+    image: './assets/splash.png',
     resizeMode: 'contain',
     backgroundColor: '#000000',
   },
@@ -42,8 +42,8 @@ const config = ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-splash-screen',
       {
-        image: './assets/images/splash-image.png',
-        imageWidth: 200,
+        image: './assets/splash.png',
+        imageWidth: 1024,
         resizeMode: 'contain',
         backgroundColor: '#000000',
       },
