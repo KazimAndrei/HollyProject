@@ -6,3 +6,4 @@ Run one-liner: `bash scripts/dev/bootstrap.sh`
 - FastAPI backend with RAG stubs, quotas, IAP verify stub
 - Postgres+pgvector and Redis via docker-compose
 - Fly.io config, Firebase stubs, OpenAI budget guard
+# GPThollyproject
