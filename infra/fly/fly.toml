@@ -1,0 +1,15 @@
+app = "holly-backend"
+primary_region = "ams"
+[build]
+  dockerfile = "../../backend/Dockerfile"
+[env]
+  PYTHONUNBUFFERED = "1"
+[[services]]
+  protocol = "tcp"
+  internal_port = 8000
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+  [[services.tcp_checks]]
+    interval = "15s"
+    timeout = "2s"

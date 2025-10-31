@@ -1,0 +1,25 @@
+{
+  "identifier": "HollyStoreKit",
+  "products": [
+    {
+      "displayName": "Weekly Premium",
+      "familyShareable": false,
+      "id": "weekly.premium",
+      "price": 7.99,
+      "referenceName": "Premium Weekly",
+      "type": "Auto-Renewable Subscription",
+      "subscription": {
+        "duration": "P1W",
+        "group": "Holly Premium",
+        "introductoryOffer": null
+      }
+    }
+  ],
+  "subscriptionGroups": [
+    {
+      "displayName": "Holly Premium",
+      "referenceName": "Holly Premium Group"
+    }
+  ],
+  "version": 1
+}

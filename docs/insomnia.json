@@ -1,0 +1,41 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-10-29T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app",
+  "resources": [
+    {
+      "_id": "wrk_1",
+      "_type": "workspace",
+      "name": "Holly API"
+    },
+    {
+      "_id": "req_1",
+      "_type": "request",
+      "parentId": "wrk_1",
+      "name": "Health",
+      "method": "GET",
+      "url": "http://localhost:8000/healthz"
+    },
+    {
+      "_id": "req_2",
+      "_type": "request",
+      "parentId": "wrk_1",
+      "name": "Chat",
+      "method": "POST",
+      "url": "http://localhost:8000/v1/chat",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\"user_id\": \"local\", \"message\": \"How to deal with anxiety?\", \"translation\": \"WEB\"}"
+      }
+    },
+    {
+      "_id": "req_3",
+      "_type": "request",
+      "parentId": "wrk_1",
+      "name": "Daily Verse",
+      "method": "GET",
+      "url": "http://localhost:8000/v1/daily-verse"
+    }
+  ]
+}

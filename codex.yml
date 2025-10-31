@@ -1,0 +1,121 @@
+# codex.yml — рецепты для OpenAI Codex CLI
+project:
+  root: .
+  ignore:
+    - "**/__pycache__/**"
+    - "**/.venv/**"
+    - "ios/Pods/**"
+    - "node_modules/**"
+
+tasks:
+
+  compose-build-fix:
+    goal: |
+      In docker-compose.yml ensure service "api" builds from repo root:
+      - set build.context = .
+      - set build.dockerfile = backend/Dockerfile
+      Make only those changes. Return a unified diff and apply.
+
+  dev-override:
+    goal: |
+      Create docker-compose.override.yml with overrides for service "api":
+      services:
+        api:
+          volumes:
+            - ./backend:/app
+          command: ["uvicorn","app.main:app","--host","0.0.0.0","--port","8000","--reload"]
+      Return the new file as a diff and apply.
+
+  add-watchfiles:
+    goal: |
+      Add dependency "watchfiles==0.22.0" to backend/requirements.txt (keep existing pins).
+      Return a unified diff and apply.
+
+  fix-alembic:
+    goal: |
+      In alembic/alembic.ini set exactly:
+      script_location = alembic
+      Do not change other lines. Show a unified diff and apply.
+
+  makefile-dev:
+    goal: |
+      Update Makefile:
+      - target `dev`: runs `docker compose up -d` then `docker compose logs -f api`
+      - target `migrate`: runs `docker compose exec api alembic -c alembic/alembic.ini upgrade head`
+      - target `doctor`: placeholder that runs `bash scripts/dev/doctor.sh` if exists
+      Return diff and apply.
+
+  fts-endpoint:
+    goal: |
+      Implement GET /v1/verses/search in backend/app/routers/verses.py:
+      - Params: q (required, min length 2), translation="WEB", limit=20, offset=0
+      - Use Postgres FTS on verses.text_tsv with bind params:
+          prefer websearch_to_tsquery(:q) when q contains spaces,
+          else plainto_tsquery(:q)
+      - Order by ts_rank(text_tsv, query) DESC
+      - Return JSON {results:[{book,chapter,verse,text,highlight}]}
+        highlight via ts_headline('english', text, query) with reasonable options.
+      - Keep SQL injection safe (no f-strings; use parameters).
+      Provide a diff and apply.
+
+  daily-verse:
+    goal: |
+      Implement GET /v1/daily-verse in backend/app/routers/verses.py:
+      - For given `translation`, pick a verse from daily_verse_pool using weighted random.
+      - Cache result per day via Redis key `dv:{translation}:{YYYY-MM-DD}` (TTL ~ 24h).
+      - Join to verses to return {book,chapter,verse,text}.
+      - Fallback to Psalm 23:1 if pool empty.
+      Return diff and apply.
+
+  seed-minimal:
+    goal: |
+      Make scripts/etl/seed_minimal.py idempotent:
+      - Ensure WEB verses (Ps 23:1, Ps 46:1) exist in `verses`
+      - Ensure text_tsv updated for rows missing it
+      - Ensure daily_verse_pool has those refs
+      - Ensure reading_plans 'john14' exists with day 1
+      Return diff and apply.
+
+  retrieval-core:
+    goal: |
+      In backend/app/services/retrieval.py add:
+      - fts_search(session_or_conn, q, translation, limit) using verses.text_tsv
+      - embed_query(q) stub (return None) and vector_search(...) stub (return [])
+      - rrf_merge(bm25_list, vec_list) implementing Reciprocal Rank Fusion
+      - retrieve(q, translation="WEB", k_text=50, k_vec=50) merging and deduping refs
+      Provide diff and apply.
+
+  llm-citations:
+    goal: |
+      In backend/app/services/llm.py ensure ChatResponse returns real citations:
+      - From provided `passages`, pick top 2-3 unique references (translation, book, chapter, verse)
+      - Keep offline path when OPENAI_API_KEY is missing
+      - No network calls beyond OpenAI
+      Provide diff and apply.
+
+  doctor-script:
+    goal: |
+      Create scripts/dev/doctor.sh (bash, executable) that:
+      - prints docker/docker compose versions
+      - checks http://localhost:8000/healthz
+      - checks that Postgres has table 'verses' and prints count(*)
+      - validates .env lines are single-line KEY=VALUE (no trailing spaces, no multi-line)
+      Update Makefile `doctor` to run it. Return diffs and apply.
+
+  ios-ats-storekit:
+    goal: |
+      Append to ios/README-iOS.md a step-by-step guide:
+      - Add files from ios/Sources/App/*
+      - Add ios/StoreKit.storekit to Scheme → Options
+      - For Debug only: Info.plist → App Transport Security → Allow Arbitrary Loads = YES
+      - Run on iOS Simulator 26.x
+      Provide diff and apply.
+
+  deploy-fly-doc:
+    goal: |
+      Create docs/DEPLOY_FLY.md with step-by-step commands:
+      - flyctl launch (from infra/fly)
+      - fly postgres create, fly pg attach
+      - fly secrets set DATABASE_URL REDIS_URL OPENAI_API_KEY OPENAI_BUDGET_USD=50
+      - fly deploy, fly status, health check endpoint
+      Return file diff and apply.
